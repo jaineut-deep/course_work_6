@@ -28,9 +28,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv("DEBUG") == "True" else False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -43,11 +43,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users",
-    "djangorestframework",
-    "django-filters",
-    "djangorestframework-simplejwt",
-    "drf-spectacular",
-
+    "rest_framework",
+    "django_filters",
+    "rest_framework_simplejwt",
+    "drf_spectacular",
+    "corsheaders",
+    "django_celery_beat",
 
 ]
 
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -191,5 +193,46 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+CORS_ALLOWED_ORIGINS = [
+    "https://read-only.example.com",
+    "https://read-and-write.example.com",
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://read-and-write.example.com",
+]
 
+# Настройки для Celery
+
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = (
+    f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
+    f'{os.getenv("REDIS_DB", "0")}'
+)
+
+# URL-адрес брокера результатов
+CELERY_RESULT_BACKEND = (
+    f'redis://{os.getenv("REDIS_HOST", "127.0.0.1")}:{os.getenv("REDIS_PORT", "6379")}/'
+    f'{os.getenv("REDIS_DB", "0")}'
+)
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = "UTC"
+
+# Флаг отслеживания выполнения задач
+CELERY_TASK_TRACK_STARTED = True
+
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    "task-name": {
+        "task": "",
+        "schedule": timedelta(minutes=2),
+    },
+}
+
+CELERY_IMPORTS = (
+    "",
+    "",
+)
