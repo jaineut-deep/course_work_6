@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+import json
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users",
+    "habbits",
     "rest_framework",
     "django_filters",
     "rest_framework_simplejwt",
@@ -141,6 +143,8 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+HABIT_VALIDATION = json.loads(os.getenv("HABIT_VALIDATION"))
 
 
 # Email
