@@ -81,5 +81,5 @@ def validate_completion_periodicity(habit: Habit, ending: datetime) -> None:
             )
         elif (ending - last_completed_habits.completed_at) > timedelta(days=7):
             raise ValidationError(
-                {"completed_at": "Нельзя выполнять привычку чаще чем 1 раз в день"}
+                {"completed_at": "Нельзя выполнять привычку реже чем 1 раз в 7 деней"}
             )
