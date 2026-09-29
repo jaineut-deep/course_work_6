@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from habbits.models import Habit, HabitCompletion
@@ -17,6 +18,7 @@ class HabitCreateAPIView(generics.CreateAPIView):
     serializer_class = HabitSerializer
     permission_classes = [IsAuthenticated, IsNotManager]
 
+    @extend_schema(summary="Метод для создания нового объекта привычки")
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
