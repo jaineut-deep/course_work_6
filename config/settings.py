@@ -240,3 +240,6 @@ CELERY_IMPORTS = (
     "",
     "",
 )
+
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
