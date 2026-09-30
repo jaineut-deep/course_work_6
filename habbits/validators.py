@@ -36,11 +36,11 @@ def validation_enjoyable_on(obj: Habit) -> None:
         raise ValidationError({"is_enjoyable": "У приятной привычки не может быть связанной привычки"})
 
 
-def validation_related_enjoyable(obj: Habit):
+def validation_related_enjoyable(obj: Habit) -> None:
     """
-
+    Валидатор, проверяющий, чтобы в качестве связанной была только приятная привычка
     :param obj:
-    :return:
+    :return: None
     """
 
     if obj.related_habit_id:
@@ -48,11 +48,11 @@ def validation_related_enjoyable(obj: Habit):
             raise ValidationError({"related_habit": "Связанной привычкой может быть только приятная"})
 
 
-def validation_max_duration(duration: int):
+def validation_max_duration(duration: int) -> None:
     """
-
+    Валидатор проверяет допустимые значения для времени выполнения привычки.
     :param duration:
-    :return:
+    :return: None
     """
 
     if duration < 15:
