@@ -1,9 +1,10 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+
 from habbits.models import Habit, HabitCompletion
-from habbits.serializers import HabitSerializer, HabitCompletionSerializer
 from habbits.paginators import HabitPaginator
+from habbits.serializers import HabitCompletionSerializer, HabitSerializer
 from users.permissions import IsNotManager, IsOwner
 
 
@@ -43,6 +44,7 @@ class HabitUpdateAPIView(generics.UpdateAPIView):
 
 
 class HabitDestroyAPIView(generics.DestroyAPIView):
+    serializer_class = HabitSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     queryset = Habit.objects.all()
 

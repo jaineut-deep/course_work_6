@@ -1,7 +1,9 @@
-import requests
 from datetime import timedelta
+
+import requests
 from django.utils import timezone
 from requests import Response
+
 from config import settings
 from habbits.models import Habit
 
@@ -17,10 +19,10 @@ def get_reminder(time, chat_id) -> Response:
     text = f"Выполнение вашей привычки скоро стартует в: {time}"
 
     params = {
-        'text': text,
-        'chat_id': chat_id,
+        "text": text,
+        "chat_id": chat_id,
     }
-    response = requests.get(f'https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage', params=params)
+    response = requests.get(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", params=params)
 
     return response
 
@@ -33,9 +35,7 @@ def send_reminders():
     now = timezone.now()
     target_time = now + timedelta(minutes=5)
 
-    habits = Habit.objects.filter(
-        time__gt=now.time(), time__lt=target_time.time()
-    ).select_related("owner")
+    habits = Habit.objects.filter(time__gt=now.time(), time__lt=target_time.time()).select_related("owner")
     reminders_sent = 0
 
     for habit in habits:

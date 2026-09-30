@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Habit, HabitCompletion
 
 
@@ -13,19 +14,20 @@ class HabitSerializer(serializers.ModelSerializer):
         is_enjoyable = data.get("is_enjoyable")
         reward = data.get("reward")
 
-        if (related_habit is not None) & (reward is not None) & (is_enjoyable == False):
+        if (related_habit is not None) & (reward is not None) & (is_enjoyable is False):
             raise serializers.ValidationError(
-                {"is_enjoyable":
-                     "У полезной привычки не может быть связанной привычки и вознаграждения одновременно"""}
+                {
+                    "is_enjoyable": "У полезной привычки не может быть связанной и вознаграждения одновременно"
+                }
             )
 
-        if (is_enjoyable == True) & (reward is not None):
+        if (is_enjoyable is True) & (reward is not None):
             raise serializers.ValidationError({"is_enjoyable": "У приятной привычки не может быть вознаграждения"})
 
-        if (is_enjoyable == True) & (related_habit is not None):
+        if (is_enjoyable is True) & (related_habit is not None):
             raise serializers.ValidationError({"is_enjoyable": "У приятной привычки не может быть связанной привычки"})
 
-        if (related_habit is not None and not related_habit.is_enjoyable):
+        if related_habit is not None and not related_habit.is_enjoyable:
             raise serializers.ValidationError({"related_habit": "Связанной привычкой может быть только приятная."})
 
         return data

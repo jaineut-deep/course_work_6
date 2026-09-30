@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+
 import json
 import os
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
@@ -51,7 +52,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "django_celery_beat",
-
 ]
 
 MIDDLEWARE = [
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -135,7 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [ BASE_DIR / "static" ]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 

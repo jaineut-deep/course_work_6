@@ -1,11 +1,14 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
+
 from django.core.exceptions import ValidationError
+
 from config import settings
 
 if TYPE_CHECKING:
-    from habbits.models import HabitCompletion, Habit
+    from habbits.models import Habit, HabitCompletion
 
 
 def validation_habit_consistency(obj: Habit) -> None:
@@ -15,7 +18,7 @@ def validation_habit_consistency(obj: Habit) -> None:
     :return: None
     """
 
-    if (obj.related_habit is not None) & (obj.reward is not None) & (obj.is_enjoyable == False):
+    if (obj.related_habit is not None) & (obj.reward is not None) & (obj.is_enjoyable is False):
         raise ValidationError("У полезной привычки не может быть связанной привычки и вознаграждения одновременно")
 
 
@@ -27,9 +30,9 @@ def validation_enjoyable_on(obj: Habit) -> None:
     :return: None
     """
 
-    if (obj.is_enjoyable == True) & (obj.reward is not None):
+    if (obj.is_enjoyable is True) & (obj.reward is not None):
         raise ValidationError({"is_enjoyable": "У приятной привычки не может быть вознаграждения"})
-    elif (obj.is_enjoyable == True) & (obj.related_habit is not None):
+    elif (obj.is_enjoyable is True) & (obj.related_habit is not None):
         raise ValidationError({"is_enjoyable": "У приятной привычки не может быть связанной привычки"})
 
 
@@ -76,10 +79,6 @@ def validate_completion_periodicity(habit: Habit, ending: datetime) -> None:
 
     if last_completed_habits:
         if (ending - last_completed_habits.completed_at) < timedelta(days=1):
-            raise ValidationError(
-                {"completed_at": "Нельзя выполнять привычку чаще чем 1 раз в день"}
-            )
+            raise ValidationError({"completed_at": "Нельзя выполнять привычку чаще чем 1 раз в день"})
         elif (ending - last_completed_habits.completed_at) > timedelta(days=7):
-            raise ValidationError(
-                {"completed_at": "Нельзя выполнять привычку реже чем 1 раз в 7 деней"}
-            )
+            raise ValidationError({"completed_at": "Нельзя выполнять привычку реже чем 1 раз в 7 деней"})

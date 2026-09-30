@@ -1,8 +1,9 @@
-from habbits.paginators import HabitPaginator
-from users.permissions import IsUserSelf, IsManager
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
+from habbits.paginators import HabitPaginator
 from users.models import CustomUser
+from users.permissions import IsManager, IsUserSelf
 from users.serializers import CustomUserSerializer, RegisterSerializer
 
 
@@ -32,5 +33,6 @@ class CustomUserUpdateAPIView(generics.UpdateAPIView):
 
 
 class CustomUserDestroyAPIView(generics.DestroyAPIView):
+    serializer_class = CustomUserSerializer
     queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated, IsUserSelf]

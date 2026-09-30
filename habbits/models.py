@@ -1,27 +1,20 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+
 from config import settings
-from .validators import (validation_habit_consistency, validation_enjoyable_on, validation_related_enjoyable,
-                         validation_max_duration, validate_completion_periodicity)
+
+from .validators import (validate_completion_periodicity, validation_enjoyable_on, validation_habit_consistency,
+                         validation_max_duration, validation_related_enjoyable)
 
 
 class Habit(models.Model):
     PERIODICITY = [(key, key.upper()) for key in settings.HABIT_VALIDATION["ALLOWED_PERIODICITY"]]
 
-    place = models.CharField(
-        max_length=60,
-        verbose_name="Место",
-        help_text="Укажите место для совершения привычки"
-    )
-    time = models.TimeField(
-        verbose_name="Время",
-        help_text="Укажите время совершения привычки"
-    )
+    place = models.CharField(max_length=60, verbose_name="Место", help_text="Укажите место для совершения привычки")
+    time = models.TimeField(verbose_name="Время", help_text="Укажите время совершения привычки")
     action = models.CharField(
-        max_length=120,
-        verbose_name="Действие",
-        help_text="Укажите действие совершаемое в качестве привычки"
+        max_length=120, verbose_name="Действие", help_text="Укажите действие совершаемое в качестве привычки"
     )
     periodicity = models.CharField(
         choices=PERIODICITY,
@@ -29,30 +22,26 @@ class Habit(models.Model):
         null=False,
         default="daily",
         verbose_name="Периодичность",
-        help_text="Выберите периодичность выполнения привычки"
+        help_text="Выберите периодичность выполнения привычки",
     )
     duration = models.PositiveIntegerField(
         default=120,
         validators=[MinValueValidator(15), MaxValueValidator(settings.HABIT_VALIDATION["DURATION"])],
         verbose_name="Время_на_выполнение(в секундах)",
-        help_text="Укажите время выполнения привычки - от 15 до 120 секунд"
+        help_text="Укажите время выполнения привычки - от 15 до 120 секунд",
     )
     is_public = models.BooleanField(
-        default=False,
-        verbose_name="Признак_публичности",
-        help_text="Отметьте нужно ли опубликовать привычку"
+        default=False, verbose_name="Признак_публичности", help_text="Отметьте нужно ли опубликовать привычку"
     )
     is_enjoyable = models.BooleanField(
-        default=False,
-        verbose_name="Признак_приятной_привычки",
-        help_text="Является ли привычка приятной"
+        default=False, verbose_name="Признак_приятной_привычки", help_text="Является ли привычка приятной"
     )
     reward = models.CharField(
         max_length=200,
         blank=True,
         null=True,
         verbose_name="Вознаграждение",
-        help_text="Чем пользователь должен себя вознаградить после полезной привычки"
+        help_text="Чем пользователь должен себя вознаградить после полезной привычки",
     )
     related_habit = models.ForeignKey(
         to="self",
@@ -60,13 +49,10 @@ class Habit(models.Model):
         blank=True,
         null=True,
         related_name="related_habits",
-        help_text="Укажите привычку, связанную с этой полезной"
+        help_text="Укажите привычку, связанную с этой полезной",
     )
     owner = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="habits",
-        verbose_name="Пользователь"
+        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="habits", verbose_name="Пользователь"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -115,7 +101,7 @@ class Habit(models.Model):
             return True
 
         last_completion = self.completions.latest("completed_at")
-        days_since_last = (timezone.now() - last_completion.completed_at)
+        days_since_last = timezone.now() - last_completion.completed_at
 
         return days_since_last >= self.get_periodicity
 
@@ -125,20 +111,19 @@ class Habit(models.Model):
         ordering = ["time"]
         constraints = [
             models.CheckConstraint(
-                name="duration_max_seconds",
-                condition=models.Q(duration__lte=settings.HABIT_VALIDATION["DURATION"])
+                name="duration_max_seconds", condition=models.Q(duration__lte=settings.HABIT_VALIDATION["DURATION"])
             ),
             models.CheckConstraint(
                 name="enjoyable_no_reward", condition=~(models.Q(is_enjoyable=True) & models.Q(reward__isnull=False))
             ),
             models.CheckConstraint(
                 name="enjoyable_no_related",
-                condition=~(models.Q(is_enjoyable=True) & models.Q(related_habit__isnull=False))
+                condition=~(models.Q(is_enjoyable=True) & models.Q(related_habit__isnull=False)),
             ),
             models.CheckConstraint(
                 name="not_both_related_and_reward",
-                condition=(models.Q(related_habit__isnull=True) | models.Q(reward__isnull=True))
-            )
+                condition=(models.Q(related_habit__isnull=True) | models.Q(reward__isnull=True)),
+            ),
         ]
 
 
