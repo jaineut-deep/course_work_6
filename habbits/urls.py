@@ -2,12 +2,14 @@ from django.urls import path
 
 from habbits.apps import HabbitsConfig
 from habbits.views import (HabitCompletionListAPIView, HabitCreateAPIView, HabitDestroyAPIView, HabitListAPIView,
-                           HabitPublicListAPIView, HabitRetrieveAPIView, HabitUpdateAPIView)
+                           HabitPublicListAPIView, HabitRetrieveAPIView, HabitUpdateAPIView,
+                           HabitCompletionCreateAPIView)
 
 app_name = HabbitsConfig.name
 
 urlpatterns = [
     path("completed_habit/", HabitCompletionListAPIView.as_view(), name="habit_completion_list"),
+    path("completed_habit/create/", HabitCompletionCreateAPIView.as_view(), name="habit_completion_create"),
     path("habit/", HabitListAPIView.as_view(), name="habit_list"),
     path("habit/create/", HabitCreateAPIView.as_view(), name="habit_create"),
     path("habit/<int:pk>/", HabitRetrieveAPIView.as_view(), name="habit_retrieve"),
