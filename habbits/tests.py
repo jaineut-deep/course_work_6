@@ -40,7 +40,7 @@ class HabitTestCase(TestCase):
         )
         self.habit_two = Habit.objects.create(
             place="Областная библиотека",
-            time=time(9, 0, 0),
+            time=time(10, 0, 0),
             action="выбрать интересные книги из буккроссинга",
             periodicity="daily",
             duration=120,
@@ -51,10 +51,10 @@ class HabitTestCase(TestCase):
             owner=self.user,
         )
         self.habit_three = Habit.objects.create(
-            place="Комната дома",
-            time=time(8, 0, 0),
-            action="утренняя зарядка",
-            periodicity="daily",
+            place="Дом",
+            time=time(9, 0, 0),
+            action="уборка комнаты",
+            periodicity="two_days",
             duration=120,
             is_public=True,
             is_enjoyable=False,
@@ -112,7 +112,7 @@ class HabitTestCase(TestCase):
             "place": "Комната дома",
             "time": time(8, 0, 0),
             "action": "зарядка",
-            "periodicity": "daily",
+            "periodicity": "two_days",
             "duration": 120,
             "is_public": True,
             "is_enjoyable": False,
@@ -190,7 +190,6 @@ class HabitTestCase(TestCase):
         page_size = response.data.get("page_size", 5)
         expected_count = min(len(serialized_habit.data), page_size)
         self.assertEqual(len(response.data["results"]), expected_count)
-
 
     def tearDown(self):
         CustomUser.objects.get(username="user_test").delete()
