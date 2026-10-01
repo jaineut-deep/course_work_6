@@ -231,14 +231,13 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BEAT_SCHEDULE = {
     "task-name": {
-        "task": "",
-        "schedule": timedelta(minutes=2),
+        "task": "users.tasks.send_reminders",
+        "schedule": timedelta(seconds=20),
     },
 }
 
 CELERY_IMPORTS = (
-    "",
-    "",
+    "users.tasks",
 )
 
 
