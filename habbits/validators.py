@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from config import settings
 
 if TYPE_CHECKING:
-    from habbits.models import Habit, HabitCompletion
+    from habbits.models import Habit
 
 
 def validation_habit_consistency(obj: Habit) -> None:
@@ -18,7 +18,7 @@ def validation_habit_consistency(obj: Habit) -> None:
     :return: None
     """
 
-    if (obj.related_habit is not None) & (obj.reward is not None) & (obj.is_enjoyable is False):
+    if (obj.related_habit is not None) and obj.reward and (not obj.is_enjoyable):
         raise ValidationError("У полезной привычки не может быть связанной привычки и вознаграждения одновременно")
 
 
@@ -30,7 +30,7 @@ def validation_enjoyable_on(obj: Habit) -> None:
     :return: None
     """
 
-    if (obj.is_enjoyable is True) & (obj.reward is not None):
+    if (obj.is_enjoyable is True) and obj.reward:
         raise ValidationError({"is_enjoyable": "У приятной привычки не может быть вознаграждения"})
     elif (obj.is_enjoyable is True) & (obj.related_habit is not None):
         raise ValidationError({"is_enjoyable": "У приятной привычки не может быть связанной привычки"})
@@ -43,8 +43,8 @@ def validation_related_enjoyable(obj: Habit) -> None:
     :return: None
     """
 
-    if obj.related_habit_id:
-        if not obj.related_habit_id.is_enjoyable:
+    if obj.related_habit is not None:
+        if not obj.related_habit.is_enjoyable:
             raise ValidationError({"related_habit": "Связанной привычкой может быть только приятная"})
 
 
@@ -63,7 +63,7 @@ def validation_max_duration(duration: int) -> None:
         )
 
 
-def validate_completion_periodicity(habit: Habit, ending: datetime) -> None:
+def validate_completion_periodicity(habit: Habit, ending: datetime) -> bool:
     """
     Валидатор, принимающий привычку и время окончани выполнения привычки и проверяющий соответствует ли время
     окончания выполнения периодизации привычки.
@@ -72,13 +72,7 @@ def validate_completion_periodicity(habit: Habit, ending: datetime) -> None:
     :return: None
     """
 
-    try:
-        last_completed_habits = habit.completions.latest("completed_at")
-    except HabitCompletion.DoesNotExist:
-        last_completed_habits = None
-
-    if last_completed_habits:
-        if (ending - last_completed_habits.completed_at) < timedelta(days=1):
-            raise ValidationError({"completed_at": "Нельзя выполнять привычку чаще чем 1 раз в день"})
-        elif (ending - last_completed_habits.completed_at) > timedelta(days=7):
-            raise ValidationError({"completed_at": "Нельзя выполнять привычку реже чем 1 раз в 7 деней"})
+    last = habit.completions.order_by("-completed_at").first()
+    if last is None:
+        return True
+    return ending - last.completed_at >= timedelta(days=habit.get_periodicity)
