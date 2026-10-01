@@ -14,14 +14,14 @@ class HabitSerializer(serializers.ModelSerializer):
         is_enjoyable = data.get("is_enjoyable")
         reward = data.get("reward")
 
-        if (related_habit is not None) & (reward is not None) & (is_enjoyable is False):
+        if (related_habit is not None) and reward and (not is_enjoyable):
             raise serializers.ValidationError(
                 {
                     "is_enjoyable": "У полезной привычки не может быть связанной и вознаграждения одновременно"
                 }
             )
 
-        if (is_enjoyable is True) & (reward is not None):
+        if (is_enjoyable is True) and reward:
             raise serializers.ValidationError({"is_enjoyable": "У приятной привычки не может быть вознаграждения"})
 
         if (is_enjoyable is True) & (related_habit is not None):
