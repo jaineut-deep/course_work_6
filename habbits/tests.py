@@ -28,7 +28,7 @@ class HabitTestCase(TestCase):
         )
         self.habit_one = Habit.objects.create(
             place="Стадион 'Локомотив'",
-            time=time(12,0,0),
+            time=time(12, 0, 0),
             action="бег по кругу",
             periodicity="two_days",
             duration=120,
