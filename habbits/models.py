@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 from config import settings
 
 from .validators import (validate_completion_periodicity, validation_enjoyable_on, validation_habit_consistency,
@@ -39,7 +39,7 @@ class Habit(models.Model):
     reward = models.CharField(
         max_length=200,
         blank=True,
-        null=True,
+        default="",
         verbose_name="Вознаграждение",
         help_text="Чем пользователь должен себя вознаградить после полезной привычки",
     )
@@ -97,13 +97,7 @@ class Habit(models.Model):
         :return:
         """
 
-        if not self.completions.exists():
-            return True
-
-        last_completion = self.completions.latest("completed_at")
-        days_since_last = timezone.now() - last_completion.completed_at
-
-        return days_since_last >= self.get_periodicity
+        return validate_completion_periodicity(self, timezone.now())
 
     class Meta:
         verbose_name = "привычка"
@@ -114,7 +108,7 @@ class Habit(models.Model):
                 name="duration_max_seconds", condition=models.Q(duration__lte=settings.HABIT_VALIDATION["DURATION"])
             ),
             models.CheckConstraint(
-                name="enjoyable_no_reward", condition=~(models.Q(is_enjoyable=True) & models.Q(reward__isnull=False))
+                name="enjoyable_no_reward", condition=~(models.Q(is_enjoyable=True) & ~models.Q(reward=""))
             ),
             models.CheckConstraint(
                 name="enjoyable_no_related",
@@ -122,7 +116,7 @@ class Habit(models.Model):
             ),
             models.CheckConstraint(
                 name="not_both_related_and_reward",
-                condition=(models.Q(related_habit__isnull=True) | models.Q(reward__isnull=True)),
+                condition=(models.Q(related_habit__isnull=True) | models.Q(reward="")),
             ),
         ]
 
@@ -142,15 +136,14 @@ class HabitCompletion(models.Model):
 
     def clean(self):
         if not self.pk:
-            validate_completion_periodicity(self.habit, self.completed_at)
+            if not validate_completion_periodicity(self.habit, timezone.now()):
+                raise ValidationError(
+                    {"completed_at": f"Привычку можно выполнять не чаще, чем раз в {self.habit.get_periodicity} дн."}
+                )
         super().clean()
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            if not self.habit.can_be_completed_today():
-                min_interval = self.habit.get_periodicity
-                raise ValueError(f"Для выполнения этой привычки ещё не прошло {min_interval} дней(дня)")
-        self.clean()
+        self.full_clean()
         return super().save(*args, **kwargs)
 
     class Meta:
