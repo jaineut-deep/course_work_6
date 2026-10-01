@@ -8,6 +8,11 @@ from habbits.serializers import HabitCompletionSerializer, HabitSerializer
 from users.permissions import IsNotManager, IsOwner
 
 
+class HabitCompletionCreateAPIView(generics.CreateAPIView):
+    serializer_class = HabitCompletionSerializer
+    permission_classes = [IsAuthenticated, IsNotManager]
+
+
 class HabitCompletionListAPIView(generics.ListAPIView):
     serializer_class = HabitCompletionSerializer
     permission_classes = [IsAuthenticated, IsOwner]
