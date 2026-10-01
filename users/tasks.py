@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import requests
+from celery import shared_task
 from django.utils import timezone
 from requests import Response
 
@@ -27,6 +28,7 @@ def get_reminder(time, chat_id) -> Response:
     return response
 
 
+@shared_task
 def send_reminders():
     """
     Функция рассылает напоминания по расписанию каждому пользователю.
