@@ -232,7 +232,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULE = {
     "task-name": {
         "task": "users.tasks.send_reminders",
-        "schedule": timedelta(seconds=20),
+        "schedule": timedelta(minutes=1),
     },
 }
 
@@ -242,3 +242,5 @@ CELERY_IMPORTS = (
 
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+TELEGRAM_URL = os.getenv("TELEGRAM_URL")
