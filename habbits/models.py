@@ -93,8 +93,8 @@ class Habit(models.Model):
 
     def can_be_completed_today(self) -> bool:
         """
-        Метод проверяющий
-        :return:
+        Метод, проверяющий может ли быть выполнена привычка сегодня
+        :return: bool
         """
 
         return validate_completion_periodicity(self, timezone.now())
