@@ -9,11 +9,13 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
+
+import json
 import os
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
@@ -43,13 +45,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users",
+    "habbits",
     "rest_framework",
     "django_filters",
     "rest_framework_simplejwt",
     "drf_spectacular",
     "corsheaders",
     "django_celery_beat",
-
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -133,7 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [ BASE_DIR / "static" ]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
@@ -141,6 +143,8 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+HABIT_VALIDATION = json.loads(os.getenv("HABIT_VALIDATION"))
 
 
 # Email
@@ -227,12 +231,16 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BEAT_SCHEDULE = {
     "task-name": {
-        "task": "",
-        "schedule": timedelta(minutes=2),
+        "task": "users.tasks.send_reminders",
+        "schedule": timedelta(minutes=1),
     },
 }
 
 CELERY_IMPORTS = (
-    "",
-    "",
+    "users.tasks",
 )
+
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+TELEGRAM_URL = os.getenv("TELEGRAM_URL")
