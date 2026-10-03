@@ -1,0 +1,9 @@
+**
+!config
+!nginx
+!habbits
+!users
+!README.md
+!manage.py
+!poetry.lock
+!pyproject.toml
