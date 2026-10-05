@@ -48,6 +48,7 @@ jobs:
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST: "127.0.0.1"
       POSTGRES_PORT: "5432"
+      HABIT_VALIDATION: ${{ secrets.HABIT_VALIDATION }}
 
     services:
       db:
@@ -100,6 +101,7 @@ jobs:
         POSTGRES_DB: ${{ env.POSTGRES_DB }}
         POSTGRES_USER: ${{ env.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        HABIT_VALIDATION: ${{ env.HABIT_VALIDATION }}
       run: poetry run python3 manage.py migrate
 
     - name: Run tests
@@ -112,6 +114,7 @@ jobs:
         POSTGRES_DB: ${{ env.POSTGRES_DB }}
         POSTGRES_USER: ${{ env.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        HABIT_VALIDATION: ${{ env.HABIT_VALIDATION }}
       run: poetry run python3 manage.py test
 
   deploy:
